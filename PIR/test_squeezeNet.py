@@ -1,6 +1,5 @@
 import paddle
-from paddle.vision.models import SqueezeNet
+from paddle.vision.models import squeezenet1_1
 
 
-#model = SqueezeNet(version='1.0')
-model = SqueezeNet(version='1.1')
+model = squeezenet1_1(pretrained=True)

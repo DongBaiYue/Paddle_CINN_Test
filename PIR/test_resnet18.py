@@ -42,7 +42,6 @@ if __name__ == '__main__':
      model = TestResNet18()
      model.check_cinn_ouput()
      model.benchmark(use_cinn=False)
-     model.check_cinn_ouput()
      model.benchmark(use_cinn=True)
      model.profile(use_cinn=True)
 

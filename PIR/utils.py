@@ -32,11 +32,13 @@ def benchmark(net, input, repeat=50, warmup=10):
     # warm up
     for i in range(warmup):
         net(input)
+        paddle.device.synchronize()
     # time
     t = []
     for i in range(repeat):
         t1 = time.time()
         output = net(input)
+        paddle.device.synchronize()
         t2 = time.time()
         t.append((t2 - t1)*1000)
     print("--[benchmark] Run for %d times, the average latency is:%f ms" % (repeat, np.mean(t)))
