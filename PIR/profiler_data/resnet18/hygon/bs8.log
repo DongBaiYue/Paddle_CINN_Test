@@ -1,0 +1,167 @@
+W0423 10:16:40.297399 26347 gpu_resources.cc:119] Please NOTE: device: 0, GPU Compute Capability: 90.0, Driver API Version: 50400.0, Runtime API Version: 50400.0
+I0423 10:16:42.892227 26347 build_cinn_pass.cc:702] --- [build_cinn_pass] detected 77 cinn supported subgraphs
+W0423 10:16:42.981186 26347 tensor.cc:405] The `is_initialized` method is deprecated since version 2.3, and will be removed in version 2.4! Please use `initialized` method instead.
+I0423 10:16:42.981590 26347 program_interpreter.cc:221] New Executor is Running.
+I0423 10:18:48.428563 26347 chrometracing_logger.cc:46] writing profiling data to ./profiler_data/resnet18/hygon/bs8_withcinn_time_2024_04_23_10_18_48_428286.paddle_trace.json
+all prim enabled:  True
+all prim enabled:  True
+all prim enabled:  True
+--[check_cinn_ouput] cinn result right.
+--[benchmark] benchmark nocinn
+--[benchmark] Run for 50 times, the average latency is:9.317722 ms
+--[benchmark] benchmark cinn
+--[benchmark] Run for 50 times, the average latency is:9.255118 ms
+--[profile] profile cinn
+============================================Perf Summary============================================
+Time Unit: s, IPS Unit: steps/s
+|                 |       avg       |       max       |       min       |
+|    batch_cost   |     0.01375     |     0.04003     |     0.00867     |
+|       ips       |     72.72135    |    115.39541    |     24.98221    |
+-------------------Device Summary-------------------
+------------------------------  --------------------  
+Device                          Utilization (%)       
+------------------------------  --------------------  
+CPU(Process)                    200.00                
+CPU(System)                     1.24                  
+GPU8                            0.00                  
+GPU7                            34.15                 
+------------------------------  --------------------  
+Note:
+CPU(Process) Utilization = Current process CPU time over all cpu cores / elapsed time, so max utilization can be reached 100% * number of cpu cores.
+CPU(System) Utilization = All processes CPU time over all cpu cores(busy time) / (busy time + idle time).
+GPU Utilization = Current process GPU time / elapsed time.
+----------------------------------------------------
+
+
+---------------------------------------------Overview Summary---------------------------------------------
+Time unit: ms
+-------------------------  -------------------------  -------------------------  -------------------------  
+Event Type                 Calls                      CPU Time                   Ratio (%)                  
+-------------------------  -------------------------  -------------------------  -------------------------  
+ProfileStep                2                          22.16                      100.00                     
+  PythonUserDefined        2                          22.08                      99.65                      
+  Forward                  2                          21.82                      98.47                      
+  UserDefined              6                          20.69                      93.37                      
+  Operator                 398                        20.30                      91.62                      
+  OperatorInner            796                        19.07                      86.06                      
+  CudaRuntime              878                        2.66                       12.00                      
+-------------------------  -------------------------  -------------------------  -------------------------  
+                           Calls                      GPU Time                   Ratio (%)                  
+-------------------------  -------------------------  -------------------------  -------------------------  
+  Memset                   2                          0.01                       0.04                       
+  Memcpy                   16                         0.06                       0.28                       
+  Kernel                   122                        7.57                       34.15                      
+-------------------------  -------------------------  -------------------------  -------------------------  
+Note:
+In this table, We sum up all collected events in terms of event type.
+The time of events collected on host are presented as CPU Time, and as GPU Time if on device.
+Events with different types may overlap or inclusion, e.g. Operator includes OperatorInner, so the sum of ratios is not 100%.
+The time of events in the same type with overlap will not calculate twice, and all time is summed after merged.
+Example:
+Thread 1:
+  Operator: |___________|     |__________|
+Thread 2:
+  Operator:   |____________|     |___|
+After merged:
+  Result:   |______________|  |__________|
+
+----------------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------Model Summary-----------------------------------------------
+Time unit: ms
+---------------  ------  ----------------------------------------  ----------------------------------------  
+Name             Calls   CPU Total / Avg / Max / Min / Ratio(%)    GPU Total / Avg / Max / Min / Ratio(%)    
+---------------  ------  ----------------------------------------  ----------------------------------------  
+ProfileStep      2       22.16 / 11.08 / 11.15 / 11.01 / 100.00    7.57 / 3.78 / 3.90 / 3.66 / 100.00        
+  Forward        2       21.82 / 10.91 / 10.97 / 10.85 / 98.47     7.57 / 3.78 / 3.90 / 3.66 / 100.00        
+  Others         -       0.34 / - / - / - / 1.53                   0.00 / - / - / - / 0.00                   
+---------------  ------  ----------------------------------------  ----------------------------------------  
+Note:
+In this table, GPU time is the sum of all device(GPU) events called in the phase.
+Unlike overview summary, if two device(GPU) events execute on different streams with overlap time, we sum them directly here.
+
+-----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------Operator Summary----------------------------------------------------------------------
+Time unit: ms
+----------------------------------------------------  ------  ----------------------------------------  ----------------------------------------  ----------  
+Name                                                  Calls   CPU Total / Avg / Max / Min / Ratio(%)    GPU Total / Avg / Max / Min / Ratio(%)    FLOPs       
+----------------------------------------------------  ------  ----------------------------------------  ----------------------------------------  ----------  
+-----------------------------------------------------------------Thread: All threads merged-----------------------------------------------------------------
+conv2d                                                40      11.00 / 0.28 / 0.31 / 0.25 / 43.47        6.19 / 0.15 / 0.48 / 0.02 / 77.39         0           
+  infer_shape                                         40      0.25 / 0.01 / 0.01 / 0.01 / 2.28          0.00 / 0.00 / 0.00 / 0.00 / 0.00          -           
+  compute                                             40      10.39 / 0.26 / 0.29 / 0.24 / 94.44        6.19 / 0.15 / 0.48 / 0.02 / 100.00        -           
+    miopenSp3AsmConv_v21_1_3_gfx9_fp32_stride1        26      - / - / - / - / -                         3.78 / 0.15 / 0.24 / 0.11 / 61.15         -           
+    con_1x1_p0_s2_wh64_k64_n_c16_asm                  6       - / - / - / - / -                         0.19 / 0.03 / 0.04 / 0.02 / 3.13          -           
+    miopenSp3AsmConv_v21_1_3_gfx9_fp32_stride2        2       - / - / - / - / -                         0.92 / 0.46 / 0.48 / 0.43 / 14.80         -           
+    con_p1_s2_w16_h4_k64_n_asm                        4       - / - / - / - / -                         0.78 / 0.20 / 0.22 / 0.17 / 12.63         -           
+    miopenGcnAsmConv7x7c3h224w224k64u2v2p3q3f1        2       - / - / - / - / -                         0.51 / 0.26 / 0.26 / 0.26 / 8.29          -           
+cinn_launch                                           154     9.30 / 0.06 / 0.22 / 0.03 / 36.75         1.45 / 0.01 / 0.24 / 0.00 / 18.13         0           
+  infer_shape                                         154     0.19 / 0.00 / 0.00 / 0.00 / 2.06          0.00 / 0.00 / 0.00 / 0.00 / 0.00          -           
+  compute                                             154     8.24 / 0.05 / 0.21 / 0.03 / 88.58         1.45 / 0.01 / 0.24 / 0.00 / 100.00        -           
+    MEMCPY_DtoD                                       13      - / - / - / - / -                         0.05 / 0.00 / 0.00 / 0.00 / 3.51          -           
+    fn_fill_constant_4_fill_constant_8_pow_9_25_k...  2       - / - / - / - / -                         0.01 / 0.00 / 0.00 / 0.00 / 0.40          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  2       - / - / - / - / -                         0.02 / 0.01 / 0.01 / 0.01 / 1.25          -           
+    fn_fill_constant_4_fill_constant_8_pow_9_19_k...  16      - / - / - / - / -                         0.05 / 0.00 / 0.00 / 0.00 / 3.24          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  15      - / - / - / - / -                         0.28 / 0.02 / 0.04 / 0.01 / 19.07         -           
+    fn_fill_constant_8_fill_constant_16_pow_17_38...  5       - / - / - / - / -                         0.02 / 0.00 / 0.00 / 0.00 / 1.46          -           
+    fn_fill_constant_9_fill_constant_18_pow_19_39...  6       - / - / - / - / -                         0.03 / 0.00 / 0.01 / 0.00 / 1.80          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_re...  6       - / - / - / - / -                         0.13 / 0.02 / 0.03 / 0.01 / 8.76          -           
+    fn_fill_constant_4_fill_constant_8_pow_9_20_k...  10      - / - / - / - / -                         0.03 / 0.00 / 0.01 / 0.00 / 2.16          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  8       - / - / - / - / -                         0.22 / 0.03 / 0.04 / 0.01 / 15.08         -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  2       - / - / - / - / -                         0.26 / 0.13 / 0.14 / 0.12 / 18.27         -           
+    MEMSET                                            1       - / - / - / - / -                         0.00 / 0.00 / 0.00 / 0.00 / 0.32          -           
+cinn_instruction_run                                  204     5.01 / 0.02 / 0.06 / 0.02 / 19.78         0.36 / 0.00 / 0.09 / 0.00 / 4.48          0           
+  infer_shape                                         204     0.65 / 0.00 / 0.01 / 0.00 / 13.05         0.00 / 0.00 / 0.00 / 0.00 / 0.00          -           
+  compute                                             204     3.51 / 0.02 / 0.05 / 0.01 / 70.09         0.05 / 0.00 / 0.03 / 0.00 / 12.87         -           
+    MEMCPY_DtoD                                       2       - / - / - / - / -                         0.01 / 0.00 / 0.00 / 0.00 / 17.01         -           
+    fn_fill_constant_8_fill_constant_16_pow_17_38...  1       - / - / - / - / -                         0.00 / 0.00 / 0.00 / 0.00 / 9.72          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  1       - / - / - / - / -                         0.03 / 0.03 / 0.03 / 0.03 / 73.26         -           
+  MEMSET                                              1       - / - / - / - / -                         0.00 / 0.00 / 0.00 / 0.00 / 1.30          -           
+  MEMCPY_DtoD                                         1       - / - / - / - / -                         0.00 / 0.00 / 0.00 / 0.00 / 1.07          -           
+  fn_broadcast_to_24_elementwise_add_25_30_kernel     2       - / - / - / - / -                         0.01 / 0.00 / 0.00 / 0.00 / 2.59          -           
+  fn_matmul_23_29_kernel                              2       - / - / - / - / -                         0.09 / 0.05 / 0.05 / 0.04 / 25.79         -           
+  fn_pool2d_21_27_kernel                              2       - / - / - / - / -                         0.02 / 0.01 / 0.01 / 0.01 / 6.84          -           
+  fn_pool2d_20_22_kernel                              2       - / - / - / - / -                         0.18 / 0.09 / 0.09 / 0.08 / 49.53         -           
+----------------------------------------------------  ------  ----------------------------------------  ----------------------------------------  ----------  
+
+
+---------------------------------------------------------------Kernel Summary---------------------------------------------------------------
+Time unit: ms
+------------------------------------------------------------------------------------------  ------  ----------------------------------------  
+Name                                                                                        Calls   GPU Total / Avg / Max / Min / Ratio(%)    
+------------------------------------------------------------------------------------------  ------  ----------------------------------------  
+miopenSp3AsmConv_v21_1_3_gfx9_fp32_stride1                                                  26      3.78 / 0.15 / 0.24 / 0.11 / 50.01         
+miopenSp3AsmConv_v21_1_3_gfx9_fp32_stride2                                                  2       0.92 / 0.46 / 0.48 / 0.43 / 12.11         
+con_p1_s2_w16_h4_k64_n_asm                                                                  4       0.78 / 0.20 / 0.22 / 0.17 / 10.33         
+miopenGcnAsmConv7x7c3h224w224k64u2v2p3q3f1                                                  2       0.51 / 0.26 / 0.26 / 0.26 / 6.78          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_broadcast_to_5_scale_7_fill_constant_10_pow_...  16      0.31 / 0.02 / 0.04 / 0.01 / 4.10          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_broadcast_to_5_scale_7_fill_constant_10_pow_...  2       0.26 / 0.13 / 0.14 / 0.12 / 3.50          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_broadcast_to_5_scale_7_fill_constant_10_pow_...  8       0.22 / 0.03 / 0.04 / 0.01 / 2.89          
+con_1x1_p0_s2_wh64_k64_n_c16_asm                                                            6       0.19 / 0.03 / 0.04 / 0.02 / 2.56          
+fn_pool2d_20_22_kernel                                                                      2       0.18 / 0.09 / 0.09 / 0.08 / 2.34          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_reshape_4_reshape_5_reshape_6_reshape_7_broa...  6       0.13 / 0.02 / 0.03 / 0.01 / 1.68          
+fn_matmul_23_29_kernel                                                                      2       0.09 / 0.05 / 0.05 / 0.04 / 1.22          
+fn_fill_constant_4_fill_constant_8_pow_9_19_kernel                                          16      0.05 / 0.00 / 0.00 / 0.00 / 0.62          
+fn_fill_constant_4_fill_constant_8_pow_9_20_kernel                                          10      0.03 / 0.00 / 0.01 / 0.00 / 0.41          
+fn_fill_constant_9_fill_constant_18_pow_19_39_kernel                                        6       0.03 / 0.00 / 0.01 / 0.00 / 0.34          
+fn_fill_constant_8_fill_constant_16_pow_17_38_kernel                                        6       0.03 / 0.00 / 0.00 / 0.00 / 0.34          
+fn_pool2d_21_27_kernel                                                                      2       0.02 / 0.01 / 0.01 / 0.01 / 0.32          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_broadcast_to_5_scale_7_fill_constant_10_pow_...  2       0.02 / 0.01 / 0.01 / 0.01 / 0.24          
+fn_broadcast_to_24_elementwise_add_25_30_kernel                                             2       0.01 / 0.00 / 0.00 / 0.00 / 0.12          
+fn_fill_constant_4_fill_constant_8_pow_9_25_kernel                                          2       0.01 / 0.00 / 0.00 / 0.00 / 0.08          
+------------------------------------------------------------------------------------------  ------  ----------------------------------------  
+
+
+-------------------------------------------UserDefined Summary-------------------------------------------
+Time unit: ms
+-------------  ------  ----------------------------------------  ----------------------------------------  
+Name           Calls   CPU Total / Avg / Max / Min / Ratio(%)    GPU Total / Avg / Max / Min / Ratio(%)    
+-------------  ------  ----------------------------------------  ----------------------------------------  
+---------------------------------------Thread: All threads merged----------------------------------------
+resent18 eval  2       22.08 / 11.04 / 11.11 / 10.98 / 99.65     7.64 / 3.82 / 3.93 / 3.71 / 100.00        
+
+
+
