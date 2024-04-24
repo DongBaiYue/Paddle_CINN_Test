@@ -1,0 +1,170 @@
+grep: warning: GREP_OPTIONS is deprecated; please use an alias or script
+W0424 05:06:01.473134 23241 gpu_resources.cc:119] Please NOTE: device: 0, GPU Compute Capability: 7.0, Driver API Version: 11.7, Runtime API Version: 11.7
+W0424 05:06:01.474887 23241 gpu_resources.cc:164] device: 0, cuDNN Version: 8.4.
+W0424 05:06:05.364758 23241 tensor.cc:405] The `is_initialized` method is deprecated since version 2.3, and will be removed in version 2.4! Please use `initialized` method instead.
+I0424 05:06:05.365013 23241 program_interpreter.cc:221] New Executor is Running.
+I0424 05:07:19.820933 23241 chrometracing_logger.cc:46] writing profiling data to ./profiler_data/resnet18/nvidia/bs1_withcinn_time_2024_04_24_05_07_19_820742.paddle_trace.json
+all prim enabled:  True
+all prim enabled:  True
+all prim enabled:  True
+--[check_cinn_ouput] cinn result right.
+--[benchmark] benchmark nocinn
+--[benchmark] Run for 50 times, the average latency is:4.177613 ms
+--[benchmark] benchmark cinn
+--[benchmark] Run for 50 times, the average latency is:4.141674 ms
+--[profile] profile cinn
+============================================Perf Summary============================================
+Time Unit: s, IPS Unit: steps/s
+|                 |       avg       |       max       |       min       |
+|    batch_cost   |     0.09706     |     0.89691     |     0.00418     |
+|       ips       |     10.30265    |    239.53122    |     1.11494     |
+-------------------Device Summary-------------------
+------------------------------  --------------------  
+Device                          Utilization (%)       
+------------------------------  --------------------  
+CPU(Process)                    50.00                 
+CPU(System)                     3.64                  
+GPU0                            26.60                 
+------------------------------  --------------------  
+Note:
+CPU(Process) Utilization = Current process CPU time over all cpu cores / elapsed time, so max utilization can be reached 100% * number of cpu cores.
+CPU(System) Utilization = All processes CPU time over all cpu cores(busy time) / (busy time + idle time).
+GPU Utilization = Current process GPU time / elapsed time.
+----------------------------------------------------
+
+
+---------------------------------------------Overview Summary---------------------------------------------
+Time unit: ms
+-------------------------  -------------------------  -------------------------  -------------------------  
+Event Type                 Calls                      CPU Time                   Ratio (%)                  
+-------------------------  -------------------------  -------------------------  -------------------------  
+ProfileStep                2                          11.52                      100.00                     
+  PythonUserDefined        2                          11.47                      99.53                      
+  Forward                  2                          11.37                      98.67                      
+  UserDefined              6                          10.43                      90.52                      
+  Operator                 398                        10.09                      87.63                      
+  OperatorInner            796                        9.51                       82.53                      
+  CudaRuntime              938                        2.39                       20.77                      
+-------------------------  -------------------------  -------------------------  -------------------------  
+                           Calls                      GPU Time                   Ratio (%)                  
+-------------------------  -------------------------  -------------------------  -------------------------  
+  Memset                   40                         0.07                       0.63                       
+  Memcpy                   82                         0.27                       2.35                       
+  Kernel                   180                        3.06                       26.60                      
+-------------------------  -------------------------  -------------------------  -------------------------  
+Note:
+In this table, We sum up all collected events in terms of event type.
+The time of events collected on host are presented as CPU Time, and as GPU Time if on device.
+Events with different types may overlap or inclusion, e.g. Operator includes OperatorInner, so the sum of ratios is not 100%.
+The time of events in the same type with overlap will not calculate twice, and all time is summed after merged.
+Example:
+Thread 1:
+  Operator: |___________|     |__________|
+Thread 2:
+  Operator:   |____________|     |___|
+After merged:
+  Result:   |______________|  |__________|
+
+----------------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------Model Summary-----------------------------------------------
+Time unit: ms
+---------------  ------  ----------------------------------------  ----------------------------------------  
+Name             Calls   CPU Total / Avg / Max / Min / Ratio(%)    GPU Total / Avg / Max / Min / Ratio(%)    
+---------------  ------  ----------------------------------------  ----------------------------------------  
+ProfileStep      2       11.52 / 5.76 / 6.07 / 5.45 / 100.00       3.06 / 1.53 / 1.53 / 1.53 / 100.00        
+  Forward        2       11.37 / 5.68 / 6.00 / 5.37 / 98.67        3.06 / 1.53 / 1.53 / 1.53 / 100.00        
+  Others         -       0.15 / - / - / - / 1.33                   0.00 / - / - / - / 0.00                   
+---------------  ------  ----------------------------------------  ----------------------------------------  
+Note:
+In this table, GPU time is the sum of all device(GPU) events called in the phase.
+Unlike overview summary, if two device(GPU) events execute on different streams with overlap time, we sum them directly here.
+
+-----------------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------Operator Summary----------------------------------------------------------------------
+Time unit: ms
+----------------------------------------------------  ------  ----------------------------------------  ----------------------------------------  ----------  
+Name                                                  Calls   CPU Total / Avg / Max / Min / Ratio(%)    GPU Total / Avg / Max / Min / Ratio(%)    FLOPs       
+----------------------------------------------------  ------  ----------------------------------------  ----------------------------------------  ----------  
+-----------------------------------------------------------------Thread: All threads merged-----------------------------------------------------------------
+conv2d                                                40      3.92 / 0.10 / 0.20 / 0.07 / 28.93         2.71 / 0.07 / 0.16 / 0.02 / 65.86         0           
+  infer_shape                                         40      0.17 / 0.00 / 0.01 / 0.00 / 4.29          0.00 / 0.00 / 0.00 / 0.00 / 0.00          -           
+  compute                                             40      3.61 / 0.09 / 0.19 / 0.06 / 92.06         2.71 / 0.07 / 0.16 / 0.02 / 100.00        -           
+    void cudnn::winograd::generateWinogradTilesKe...  26      - / - / - / - / -                         0.35 / 0.01 / 0.04 / 0.00 / 13.11         -           
+    volta_scudnn_winograd_128x128_ldg1_ldg4_relu_...  26      - / - / - / - / -                         1.53 / 0.06 / 0.12 / 0.02 / 56.50         -           
+    void cudnn::cnn::kern_precompute_indices<fals...  6       - / - / - / - / -                         0.02 / 0.00 / 0.00 / 0.00 / 0.78          -           
+    void precomputed_convolve_sgemm<float, 1024, ...  6       - / - / - / - / -                         0.10 / 0.02 / 0.02 / 0.01 / 3.59          -           
+    void cudnn::ops::nchwToNhwcKernel<float, floa...  12      - / - / - / - / -                         0.10 / 0.01 / 0.02 / 0.00 / 3.52          -           
+    void cask_cudnn::computeOffsetsKernel<false, ...  8       - / - / - / - / -                         0.03 / 0.00 / 0.00 / 0.00 / 1.11          -           
+    volta_scudnn_128x32_sliced1x4_ldg4_relu_exp_m...  6       - / - / - / - / -                         0.47 / 0.08 / 0.13 / 0.04 / 17.55         -           
+    void cudnn::ops::nhwcToNchwKernel<float, floa...  6       - / - / - / - / -                         0.03 / 0.00 / 0.01 / 0.00 / 1.05          -           
+    volta_scudnn_128x32_relu_medium_nn_v1             2       - / - / - / - / -                         0.08 / 0.04 / 0.04 / 0.04 / 2.80          -           
+cinn_launch                                           154     6.18 / 0.04 / 0.21 / 0.02 / 45.61         0.70 / 0.00 / 0.03 / 0.00 / 17.07         0           
+  infer_shape                                         154     0.13 / 0.00 / 0.00 / 0.00 / 2.10          0.00 / 0.00 / 0.00 / 0.00 / 0.00          -           
+  compute                                             154     5.60 / 0.04 / 0.21 / 0.02 / 90.69         0.70 / 0.00 / 0.03 / 0.00 / 100.00        -           
+cinn_instruction_run                                  204     3.45 / 0.02 / 0.04 / 0.01 / 25.47         0.70 / 0.00 / 0.01 / 0.00 / 17.07         0           
+  infer_shape                                         204     0.45 / 0.00 / 0.01 / 0.00 / 13.19         0.00 / 0.00 / 0.00 / 0.00 / 0.00          -           
+  compute                                             204     2.62 / 0.01 / 0.04 / 0.01 / 75.98         0.70 / 0.00 / 0.01 / 0.00 / 100.00        -           
+    MEMSET                                            40      - / - / - / - / -                         0.07 / 0.00 / 0.00 / 0.00 / 10.33         -           
+    MEMCPY_DtoD                                       82      - / - / - / - / -                         0.27 / 0.00 / 0.00 / 0.00 / 38.55         -           
+    fn_broadcast_to_24_elementwise_add_25_30_kernel   2       - / - / - / - / -                         0.01 / 0.00 / 0.00 / 0.00 / 1.00          -           
+    std::enable_if<!(false), void>::type internal...  2       - / - / - / - / -                         0.02 / 0.01 / 0.01 / 0.01 / 2.31          -           
+    void cudnn::ops::pooling_fw_4d_kernel<float, ...  2       - / - / - / - / -                         0.01 / 0.01 / 0.01 / 0.01 / 2.10          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  2       - / - / - / - / -                         0.01 / 0.00 / 0.00 / 0.00 / 1.31          -           
+    fn_fill_constant_4_fill_constant_8_pow_9_25_k...  2       - / - / - / - / -                         0.01 / 0.00 / 0.00 / 0.00 / 1.05          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  16      - / - / - / - / -                         0.07 / 0.00 / 0.01 / 0.00 / 10.25         -           
+    fn_fill_constant_4_fill_constant_8_pow_9_19_k...  16      - / - / - / - / -                         0.05 / 0.00 / 0.00 / 0.00 / 7.71          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_re...  6       - / - / - / - / -                         0.03 / 0.00 / 0.01 / 0.00 / 3.93          -           
+    fn_fill_constant_9_fill_constant_18_pow_19_39...  6       - / - / - / - / -                         0.02 / 0.00 / 0.00 / 0.00 / 2.80          -           
+    fn_fill_constant_8_fill_constant_16_pow_17_38...  6       - / - / - / - / -                         0.02 / 0.00 / 0.00 / 0.00 / 2.78          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  8       - / - / - / - / -                         0.04 / 0.01 / 0.01 / 0.00 / 5.72          -           
+    fn_fill_constant_4_fill_constant_8_pow_9_20_k...  10      - / - / - / - / -                         0.03 / 0.00 / 0.00 / 0.00 / 4.74          -           
+    void cudnn::ops::pooling_fw_4d_kernel<float, ...  2       - / - / - / - / -                         0.02 / 0.01 / 0.01 / 0.01 / 2.62          -           
+    fn_reshape_0_reshape_1_reshape_2_reshape_3_br...  2       - / - / - / - / -                         0.02 / 0.01 / 0.01 / 0.01 / 2.81          -           
+----------------------------------------------------  ------  ----------------------------------------  ----------------------------------------  ----------  
+
+
+---------------------------------------------------------------Kernel Summary---------------------------------------------------------------
+Time unit: ms
+------------------------------------------------------------------------------------------  ------  ----------------------------------------  
+Name                                                                                        Calls   GPU Total / Avg / Max / Min / Ratio(%)    
+------------------------------------------------------------------------------------------  ------  ----------------------------------------  
+volta_scudnn_winograd_128x128_ldg1_ldg4_relu_tile148t_nt_v1                                 26      1.53 / 0.06 / 0.12 / 0.02 / 49.89         
+volta_scudnn_128x32_sliced1x4_ldg4_relu_exp_medium_nhwc_tn_v1                               6       0.47 / 0.08 / 0.13 / 0.04 / 15.50         
+void cudnn::winograd::generateWinogradTilesKernel<0, float, float>                          26      0.35 / 0.01 / 0.04 / 0.00 / 11.57         
+void precomputed_convolve_sgemm<float, 1024, 5, 5, 4, 3, 3, 1, false>                       6       0.10 / 0.02 / 0.02 / 0.01 / 3.17          
+void cudnn::ops::nchwToNhwcKernel<float, float, float, false, true, (cudnnKernelDataTyp...  12      0.10 / 0.01 / 0.02 / 0.00 / 3.11          
+volta_scudnn_128x32_relu_medium_nn_v1                                                       2       0.08 / 0.04 / 0.04 / 0.04 / 2.48          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_broadcast_to_5_scale_7_fill_constant_10_pow_...  16      0.07 / 0.00 / 0.01 / 0.00 / 2.35          
+fn_fill_constant_4_fill_constant_8_pow_9_19_kernel                                          16      0.05 / 0.00 / 0.00 / 0.00 / 1.76          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_broadcast_to_5_scale_7_fill_constant_10_pow_...  8       0.04 / 0.01 / 0.01 / 0.00 / 1.31          
+fn_fill_constant_4_fill_constant_8_pow_9_20_kernel                                          10      0.03 / 0.00 / 0.00 / 0.00 / 1.08          
+void cask_cudnn::computeOffsetsKernel<false, false>                                         8       0.03 / 0.00 / 0.00 / 0.00 / 0.98          
+void cudnn::ops::nhwcToNchwKernel<float, float, float, true, false, (cudnnKernelDataTyp...  6       0.03 / 0.00 / 0.01 / 0.00 / 0.93          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_reshape_4_reshape_5_reshape_6_reshape_7_broa...  6       0.03 / 0.00 / 0.01 / 0.00 / 0.90          
+void cudnn::cnn::kern_precompute_indices<false>                                             6       0.02 / 0.00 / 0.00 / 0.00 / 0.69          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_broadcast_to_5_scale_7_fill_constant_10_pow_...  2       0.02 / 0.01 / 0.01 / 0.01 / 0.64          
+fn_fill_constant_9_fill_constant_18_pow_19_39_kernel                                        6       0.02 / 0.00 / 0.00 / 0.00 / 0.64          
+fn_fill_constant_8_fill_constant_16_pow_17_38_kernel                                        6       0.02 / 0.00 / 0.00 / 0.00 / 0.64          
+void cudnn::ops::pooling_fw_4d_kernel<float, float, cudnn::maxpooling_func<float, float...  2       0.02 / 0.01 / 0.01 / 0.01 / 0.60          
+std::enable_if<!(false), void>::type internal::gemvx::kernel<int, int, float, float, fl...  2       0.02 / 0.01 / 0.01 / 0.01 / 0.53          
+void cudnn::ops::pooling_fw_4d_kernel<float, float, cudnn::averpooling_func<float, true...  2       0.01 / 0.01 / 0.01 / 0.01 / 0.48          
+fn_reshape_0_reshape_1_reshape_2_reshape_3_broadcast_to_5_scale_7_fill_constant_10_pow_...  2       0.01 / 0.00 / 0.00 / 0.00 / 0.30          
+fn_fill_constant_4_fill_constant_8_pow_9_25_kernel                                          2       0.01 / 0.00 / 0.00 / 0.00 / 0.24          
+fn_broadcast_to_24_elementwise_add_25_30_kernel                                             2       0.01 / 0.00 / 0.00 / 0.00 / 0.23          
+------------------------------------------------------------------------------------------  ------  ----------------------------------------  
+
+
+-------------------------------------------UserDefined Summary-------------------------------------------
+Time unit: ms
+-------------  ------  ----------------------------------------  ----------------------------------------  
+Name           Calls   CPU Total / Avg / Max / Min / Ratio(%)    GPU Total / Avg / Max / Min / Ratio(%)    
+-------------  ------  ----------------------------------------  ----------------------------------------  
+---------------------------------------Thread: All threads merged----------------------------------------
+resent18 eval  2       11.47 / 5.73 / 6.04 / 5.42 / 99.53        3.41 / 1.70 / 1.70 / 1.70 / 100.00        
+
+
+
